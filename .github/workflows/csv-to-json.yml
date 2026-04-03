@@ -1,0 +1,43 @@
+name: CSV to JSON
+
+on:
+  push:
+    paths:
+      - 'litclock_annotated.csv'
+      - 'profanity_patterns.R'
+      - 'csv_to_json.R'
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            readr
+            dplyr
+            purrr
+            stringr
+            jsonlite
+            markdown
+
+      - name: Run CSV to JSON conversion
+        run: Rscript csv_to_json.R
+
+      - name: Commit generated JSON files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/times/
+          git diff --cached --quiet || git commit -m "chore: regenerate JSON from CSV [skip ci]"
+          git push
