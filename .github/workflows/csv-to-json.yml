@@ -1,7 +1,7 @@
 name: CSV to JSON
 
 on:
-  push:
+  pull_request:
     paths:
       - 'litclock_annotated.csv'
       - 'profanity_patterns.R'
